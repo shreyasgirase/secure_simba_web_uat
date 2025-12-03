@@ -179,6 +179,9 @@ class _InsuranceFormState extends State<InsuranceForm> {
                   appState.selectedRegNO == null) {
                 return const SizedBox.shrink(); // This hides the widget
               }
+              if(appState.selectedRegNO == "hide") {
+                return const SizedBox.shrink();
+              }
               if (field["field_name"] != "Gender" &&
                   field["field_name"] != "Courtesy Title" &&
                   field["field_name"] != "Marital Status") {
@@ -262,7 +265,7 @@ class _InsuranceFormState extends State<InsuranceForm> {
                                                   "Block 4")) {
                                         return null;
                                       }
-                                      if (value == null || value.isEmpty) {
+                                      if (value == null || value.trim().isEmpty) {
                                         return 'Please Enter ${field["field_name"]}';
                                       }
                                       if (appState.selectedRegNO == "BH") {
@@ -284,17 +287,17 @@ class _InsuranceFormState extends State<InsuranceForm> {
                                           }
                                         }
                                         if (field["field_name"] == "Block 4") {
-                                          if (!RegExp(r'^[A-Za-z]{1,2}$')
+                                          if (!RegExp(r'^[A-Z]$')
                                               .hasMatch(value)) {
-                                            return 'Must be 1 or 2 character only';
+                                            return 'Must be exactly 1 capital letter';
                                           }
                                         }
                                       }
                                       if (appState.selectedRegNO == "State") {
                                         if (field["field_name"] == "Block 1") {
-                                          if (!RegExp(r'^[A-Za-z]{2}$')
+                                          if (!RegExp(r'^[A-Z]{2}$')
                                               .hasMatch(value)) {
-                                            return 'Must be exactly 2 characters';
+                                            return 'Must be exactly 2 capital letters';
                                           }
                                         }
                                         if (field["field_name"] == "Block 2") {
@@ -304,9 +307,9 @@ class _InsuranceFormState extends State<InsuranceForm> {
                                           }
                                         }
                                         if (field["field_name"] == "Block 3") {
-                                          if (!RegExp(r'^[A-Za-z]{1,2}$')
+                                          if (!RegExp(r'^[A-Z]{1,4}$')
                                               .hasMatch(value)) {
-                                            return 'Must be 1 or 2 character only';
+                                            return 'Min 1 and Max 4 capital letters are allowed';
                                           }
                                         }
                                         if (field["field_name"] == "Block 4") {

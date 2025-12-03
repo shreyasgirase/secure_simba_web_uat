@@ -285,6 +285,7 @@ class _MyFormState extends State<MyForm> {
   String? customerEmailId;
   String? customerMobile;
   String? linkSentTo;
+  String? registrationNumberType;
 
   Map<String, dynamic> policyRmMap = {
     "0414228": [
@@ -728,6 +729,18 @@ class _MyFormState extends State<MyForm> {
 
         requesterRemarkController.text = data["remark"] ?? '';
         selectedEndorsementSubType = data['sub_type'];
+        if (selectedEndorsementSubType == 'Vehicle Registration Number') {
+          selectedRegNO = data['registration_number_type'] ==
+                  'Bharat_registration_number'
+              ? 'BH'
+              : data['registration_number_type'] == 'State_registration_number'
+                  ? 'State'
+                  : 'Other';
+          isVehicleReg = true;
+        } else {
+          selectedRegNO = "hide";
+        }
+        context.read<AppState>().updateVariables(selectedRegNO: selectedRegNO);
         salesEmailController.text = data["email"] ?? '';
         salesMobileController.text = data["mobile"] ?? '';
         selectedPaymentMode = data["payment_mode"];
@@ -2254,7 +2267,23 @@ class _MyFormState extends State<MyForm> {
   }
 
   uploadProposal(context) async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    selectedRegNO = appState.selectedRegNO;
+    print("selected registration_no_type : " + selectedRegNO);
     print("uploaded proposal");
+
+    if (selectedEndorsementSubType == 'Vehicle Registration Number') {
+      if (selectedRegNO.toLowerCase() == 'bh') {
+        registrationNumberType = 'Bharat_registration_number';
+      } else if (selectedRegNO.toLowerCase() == 'state') {
+        registrationNumberType = 'State_registration_number';
+      } else {
+        registrationNumberType = 'other_registration_number';
+      }
+    } else {
+      registrationNumberType = null;
+    }
+
     print(propProposalId);
     List finalInstruments = [];
     List emptyInstruments = [];
@@ -2439,6 +2468,7 @@ class _MyFormState extends State<MyForm> {
                       : null,
           "sub_type": selectedEndorsementSubType,
           "endt_sub_type": selectedEndorsementSubType,
+          "registration_number_type": registrationNumberType,
           "product": productController.text,
           "endorsement_type": selectedEndorsementType,
           "email": salesEmailController.text.isEmpty
@@ -2495,7 +2525,7 @@ class _MyFormState extends State<MyForm> {
       'encryptedData': resultProposal
     };
     print(encryptedProposalData);
-    final appState = Provider.of<AppState>(context, listen: false);
+    // final appState = Provider.of<AppState>(context, listen: false);
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       "Accept": "application/json",
@@ -2624,6 +2654,21 @@ class _MyFormState extends State<MyForm> {
     List emptyInstruments = [];
     var i = 0;
     final appState = Provider.of<AppState>(context, listen: false);
+    selectedRegNO = appState.selectedRegNO;
+    print("selected registration_no_type : " + selectedRegNO);
+
+    if (selectedEndorsementSubType == 'Vehicle Registration Number') {
+      if (selectedRegNO.toLowerCase() == 'bh') {
+        registrationNumberType = 'Bharat_registration_number';
+      } else if (selectedRegNO.toLowerCase() == 'state') {
+        registrationNumberType = 'State_registration_number';
+      } else {
+        registrationNumberType = 'other_registration_number';
+      }
+    } else {
+      registrationNumberType = null;
+    }
+
     var proposalId = appState.proposalId;
     if (selectedEndorsementRequestType == 'Financial Endorsement' &&
         selectedPaymentMode == 'Cheque') {
@@ -2813,6 +2858,7 @@ class _MyFormState extends State<MyForm> {
                       : null,
           "sub_type": selectedEndorsementSubType,
           "endt_sub_type": selectedEndorsementSubType,
+          "registration_number_type": registrationNumberType,
           "product": productController.text,
           "endorsement_type": selectedEndorsementType,
           "email": salesEmailController.text.isEmpty
@@ -4469,6 +4515,10 @@ class _MyFormState extends State<MyForm> {
                 premiumCollectedController.text = '0';
               });
             }
+            if (selectedEndorsementRequestType !=
+                'Basic Information Endorsement') {
+              isVehicleReg = false;
+            }
 
             dynamicForm = const SizedBox.shrink();
             selectedEndorsementType = null;
@@ -4509,6 +4559,9 @@ class _MyFormState extends State<MyForm> {
         value: selectedEndorsementType,
         onChanged: (val) {
           setState(() {
+            if (val != 'Vehicle Details') {
+              isVehicleReg = false;
+            }
             selectedEndorsementType = val;
             dynamicForm = const SizedBox.shrink();
             selectedEndorsementSubType = null;
@@ -4567,6 +4620,7 @@ class _MyFormState extends State<MyForm> {
   }
 
   Widget _radioOption(String label) {
+    final appState = Provider.of<AppState>(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -4581,8 +4635,8 @@ class _MyFormState extends State<MyForm> {
             // setState(() {
             //   selectedRegNO = value!;
             // });
-            print("Reg No type to be updated : " + value.toString());
             context.read<AppState>().updateVariables(selectedRegNO: value!);
+            print("Registration no updated value : " + appState.selectedRegNO);
           },
         ),
         Text(label),
@@ -4654,6 +4708,8 @@ class _MyFormState extends State<MyForm> {
           setState(() {
             if (val == 'Vehicle Registration Number') {
               isVehicleReg = true;
+            } else {
+              isVehicleReg = false;
             }
             selectedEndorsementSubType = val;
             dynamicForm = const SizedBox.shrink();

@@ -111,21 +111,15 @@ class AppState extends ChangeNotifier {
             'imdCode': data['imdCode'].toString(),
           };
     try {
-      print("Shreyas");
-      String result = aesCbcEncryptJson(jsonEncode(postData));
-      Map<String, dynamic> encryptedData = {'encryptedData': result};
       final response = await dio.post(
           'https://uatcld.sbigeneral.in/SecureApp/checkEmployee',
-          data: encryptedData,
+          data: postData,
           options: Options(headers: headers));
 
       if (response.statusCode == 200) {
-        String decryptedData = aesCbcDecryptJson(response.data);
-        final Map<String, dynamic> data = jsonDecode(decryptedData);
-        print("Decrypted Data from checkEmployee API"+data.toString());
-        // final Map<String, dynamic> data = jsonDecode(response.data);
+        final Map<String, dynamic> data = jsonDecode(response.data);
 
-        _accessToken = data["resPayload"]["token"];
+        _accessToken = data["token"];
         print(_accessToken);
       } else {
         throw Exception('Failed to create token');
