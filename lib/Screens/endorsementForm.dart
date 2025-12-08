@@ -4631,13 +4631,11 @@ class _MyFormState extends State<MyForm> {
           activeColor: const Color.fromRGBO(143, 19, 168, 1),
           value: label,
           groupValue: context.watch<AppState>().selectedRegNO,
-          onChanged: (String? value) {
-            // setState(() {
-            //   selectedRegNO = value!;
-            // });
-            context.read<AppState>().updateVariables(selectedRegNO: value!);
-            print("Registration no updated value : " + appState.selectedRegNO);
-          },
+          onChanged: widget.isView
+                ? null
+                : (String? value) {
+                  context.read<AppState>().updateVariables(selectedRegNO: value!);
+                }
         ),
         Text(label),
       ],
